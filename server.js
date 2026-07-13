@@ -37,6 +37,7 @@ function saveSettings(s) {
 }
 
 let settings = loadSettings();
+const visits = [];
 
 function sign(payload) {
   const data = Buffer.from(JSON.stringify(payload)).toString("base64url");
@@ -166,6 +167,21 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === "/api/logout" && req.method === "POST") {
     return sendJson(res, 200, { ok: true });
+  }
+
+  if (pathname === "/api/visit" && req.method === "POST") {
+    visits.push(Date.now());
+    return sendJson(res, 200, { ok: true, persisted: false });
+  }
+
+  if (pathname === "/api/stats" && req.method === "GET") {
+    const now = Date.now();
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const today = visits.filter((t) => t >= start.getTime()).length;
+    const last24 = visits.filter((t) => t >= now - 86400000).length;
+    const last7 = visits.filter((t) => t >= now - 7 * 86400000).length;
+    return sendJson(res, 200, { today, last24, last7, persisted: false });
   }
 
   if (pathname === "/admin" || pathname === "/admin/") {
