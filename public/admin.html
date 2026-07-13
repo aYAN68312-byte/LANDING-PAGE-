@@ -117,6 +117,25 @@
             </div>
 
             <div class="card">
+              <h2>Visitor Stats</h2>
+              <div class="stat-grid">
+                <div class="stat-box">
+                  <span>Today</span>
+                  <strong id="stat-today">0</strong>
+                </div>
+                <div class="stat-box">
+                  <span>Last 24h</span>
+                  <strong id="stat-24">0</strong>
+                </div>
+                <div class="stat-box">
+                  <span>Last 7 days</span>
+                  <strong id="stat-7">0</strong>
+                </div>
+              </div>
+              <p class="hint" id="stat-note">Counts every site visit. For accurate persistent counts, connect <strong>Vercel KV</strong> (Storage → Create KV) — it auto-adds the env vars.</p>
+            </div>
+
+            <div class="card">
               <h2>Call To Action</h2>
               <label>Button text (EN)
                 <input name="ctaTextEn" type="text">
