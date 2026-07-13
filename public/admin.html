@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SouthBook Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=Noto+Sans+Devanagari:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+  </head>
+  <body>
+    <div class="app">
+      <!-- Login -->
+      <section id="login-view" class="login">
+        <div class="login__card">
+          <h1>SouthBook <span>Admin</span></h1>
+          <p>Enter your admin password to manage the site.</p>
+          <form id="login-form">
+            <input id="login-password" type="password" placeholder="Admin password" autocomplete="current-password" required>
+            <button type="submit">Login</button>
+            <p id="login-error" class="error"></p>
+          </form>
+        </div>
+      </section>
+
+      <!-- Dashboard -->
+      <section id="admin-view" class="dashboard hidden">
+        <header class="topbar">
+          <div class="brand">SouthBook <span>Admin</span></div>
+          <div class="topbar__right">
+            <a class="ghost" href="/" target="_blank" rel="noopener">View site ↗</a>
+            <button id="logout-btn" class="ghost">Logout</button>
+          </div>
+        </header>
+
+        <div class="container">
+          <div id="toast" class="toast hidden"></div>
+
+          <form id="settings-form" class="grid">
+            <div class="card">
+              <h2>WhatsApp & Branding</h2>
+              <label>WhatsApp link
+                <input name="whatsappLink" type="text" placeholder="https://wa.link/xxxx or https://wa.me/91...">
+                <small>This is the link users tap to connect on WhatsApp. Change it anytime.</small>
+              </label>
+              <label>Brand name
+                <input name="brandName" type="text" placeholder="SouthBook">
+              </label>
+              <label>Logo image file
+                <input name="logoPath" type="text" placeholder="south book logo.png">
+              </label>
+              <label>Hero background image
+                <input name="heroImage" type="text" placeholder="2a8c1958-....jpg">
+              </label>
+            </div>
+
+            <div class="card">
+              <h2>Hero Text</h2>
+              <label>Eyebrow (EN)
+                <input name="eyebrowEn" type="text">
+              </label>
+              <label>Eyebrow (HI)
+                <input name="eyebrowHi" type="text">
+              </label>
+              <label>Title
+                <input name="heroTitle" type="text">
+              </label>
+              <label>Hero copy (EN)
+                <textarea name="heroCopyEn" rows="2"></textarea>
+              </label>
+              <label>Hero copy (HI)
+                <textarea name="heroCopyHi" rows="2"></textarea>
+              </label>
+              <label>Small copy (EN)
+                <textarea name="heroCopySmallEn" rows="2"></textarea>
+              </label>
+              <label>Small copy (HI)
+                <textarea name="heroCopySmallHi" rows="2"></textarea>
+              </label>
+            </div>
+
+            <div class="card">
+              <h2>Stats</h2>
+              <label>Users label (EN)
+                <input name="usersLabelEn" type="text">
+              </label>
+              <label>Users label (HI)
+                <input name="usersLabelHi" type="text">
+              </label>
+              <label>Starting user count
+                <input name="userCount" type="number" min="0">
+              </label>
+              <label class="checkbox">
+                <input name="animateUsers" type="checkbox"> Animate user count (+1 per second)
+              </label>
+
+              <hr>
+
+              <label>Min deposit label (EN)
+                <input name="minDepositLabelEn" type="text">
+              </label>
+              <label>Min deposit label (HI)
+                <input name="minDepositLabelHi" type="text">
+              </label>
+              <label>Min deposit (number)
+                <input name="minDeposit" type="number" min="0">
+              </label>
+
+              <label>Min withdrawal label (EN)
+                <input name="minWithdrawalLabelEn" type="text">
+              </label>
+              <label>Min withdrawal label (HI)
+                <input name="minWithdrawalLabelHi" type="text">
+              </label>
+              <label>Min withdrawal (number)
+                <input name="minWithdrawal" type="number" min="0">
+              </label>
+            </div>
+
+            <div class="card">
+              <h2>Call To Action</h2>
+              <label>Button text (EN)
+                <input name="ctaTextEn" type="text">
+              </label>
+              <label>Button text (HI)
+                <input name="ctaTextHi" type="text">
+              </label>
+            </div>
+
+            <div class="card">
+              <h2>Service Section</h2>
+              <label>Service eyebrow
+                <input name="serviceEyebrow" type="text">
+              </label>
+              <label>Service title (EN)
+                <textarea name="serviceTitleEn" rows="2"></textarea>
+              </label>
+              <label>Service title (HI)
+                <textarea name="serviceTitleHi" rows="2"></textarea>
+              </label>
+              <label>Service points (one per line)
+                <textarea name="servicePoints" rows="4" placeholder="Fast Reply / तेज जवाब"></textarea>
+              </label>
+            </div>
+
+            <div class="card">
+              <h2>Admin Password</h2>
+              <p class="hint">The admin password is set via the <code>ADMIN_PASSWORD</code> environment variable on your host (Vercel). Default is <code>admin123</code> — change it in the Vercel project settings. It cannot be changed from here.</p>
+            </div>
+
+            <div class="card card--full actions">
+              <button type="submit" class="primary">Save changes</button>
+              <a class="ghost view" href="/" target="_blank" rel="noopener">Open live site ↗</a>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+    <script src="admin.js"></script>
+  </body>
+</html>
