@@ -143,8 +143,17 @@
             </div>
 
             <div class="card">
-              <h2>Admin Password</h2>
-              <p class="hint">The admin password is set via the <code>ADMIN_PASSWORD</code> environment variable on your host (Vercel). Default is <code>admin123</code> — change it in the Vercel project settings. It cannot be changed from here.</p>
+              <h2>Change Admin Password</h2>
+              <label>Current password
+                <input name="currentPassword" type="password" autocomplete="current-password">
+              </label>
+              <label>New password
+                <input name="newPassword" type="password" autocomplete="new-password">
+              </label>
+              <label>Confirm new password
+                <input name="confirmPassword" type="password" autocomplete="new-password">
+              </label>
+              <p class="hint">Saves with the rest of the settings. Default password is <code>admin123</code> until you change it.</p>
             </div>
 
             <div class="card card--full actions">
