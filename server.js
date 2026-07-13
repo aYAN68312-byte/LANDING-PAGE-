@@ -59,6 +59,21 @@ function verifyToken(token) {
   }
 }
 
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const derived = crypto.scryptSync(password, salt, 64).toString("hex");
+  return salt + ":" + derived;
+}
+
+function verifyPassword(password, stored) {
+  if (!stored || !stored.includes(":")) return false;
+  const [salt, key] = stored.split(":");
+  const derived = crypto.scryptSync(password, salt, 64).toString("hex");
+  const a = Buffer.from(key, "hex");
+  const b = Buffer.from(derived, "hex");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
 function sendJson(res, status, data) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(data));
@@ -126,7 +141,10 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === "/api/login" && req.method === "POST") {
     const body = parseBody(await readBody(req));
-    if (body.password === ADMIN_PASSWORD) return sendJson(res, 200, { token: sign({ exp: Date.now() + 12 * 60 * 60 * 1000 }) });
+    const ok = settings.adminPasswordHash
+      ? verifyPassword(body.password, settings.adminPasswordHash)
+      : body.password === ADMIN_PASSWORD;
+    if (ok) return sendJson(res, 200, { token: sign({ exp: Date.now() + 12 * 60 * 60 * 1000 }) });
     return sendJson(res, 401, { error: "Wrong password" });
   }
 
@@ -134,6 +152,14 @@ const server = http.createServer(async (req, res) => {
     if (!verifyToken(token)) return sendJson(res, 401, { error: "Unauthorized" });
     const body = parseBody(await readBody(req));
     settings = Object.assign(loadSettings(), sanitizeSettings(body, loadSettings()));
+    if (body.newPassword) {
+      const currentOk = settings.adminPasswordHash
+        ? verifyPassword(body.currentPassword || "", settings.adminPasswordHash)
+        : (body.currentPassword || "") === ADMIN_PASSWORD;
+      if (!currentOk) return sendJson(res, 401, { error: "Current password is incorrect" });
+      if (body.newPassword.length < 4) return sendJson(res, 400, { error: "New password too short" });
+      settings.adminPasswordHash = hashPassword(body.newPassword);
+    }
     saveSettings(settings);
     return sendJson(res, 200, { ok: true, settings: publicSettings(settings) });
   }
