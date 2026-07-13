@@ -1,0 +1,35 @@
+{
+  "brandName": "SouthBook",
+  "whatsappLink": "https://wa.link/e048tx",
+  "logoPath": "south book logo.png",
+  "heroImage": "2a8c1958-a692-430e-a78f-e573d3b93a59.jpg",
+  "eyebrowEn": "Fast ID Support",
+  "eyebrowHi": "तेज ID सपोर्ट",
+  "heroTitle": "SouthBook",
+  "heroCopyEn": "Get your SouthBook ID quickly through WhatsApp.",
+  "heroCopyHi": "अपनी SouthBook ID जल्दी पाने के लिए WhatsApp पर संपर्क करें.",
+  "heroCopySmallEn": "Tap the button and our team will connect with you directly.",
+  "heroCopySmallHi": "बटन दबाते ही हमारी टीम आपसे सीधे जुड़ जाएगी.",
+  "stats": {
+    "usersLabelEn": "New Users",
+    "usersLabelHi": "नए यूजर",
+    "userCount": 12302,
+    "animateUsers": true,
+    "minDepositLabelEn": "MIN DEPOSIT",
+    "minDepositLabelHi": "पहली ID डिपॉजिट",
+    "minDeposit": 200,
+    "minWithdrawalLabelEn": "MIN WITHDRAWAL",
+    "minWithdrawalLabelHi": "हर बार विड्रॉ",
+    "minWithdrawal": 300
+  },
+  "ctaTextEn": "Get Your ID",
+  "ctaTextHi": "WhatsApp पर संपर्क करें",
+  "serviceEyebrow": "Best Service / बेहतरीन सर्विस",
+  "serviceTitleEn": "We provide the best service with 24*7 customer support.",
+  "serviceTitleHi": "हम 24*7 कस्टमर सपोर्ट के साथ बेहतरीन सर्विस प्रदान करते हैं.",
+  "servicePoints": [
+    "Fast Reply / तेज जवाब",
+    "Trusted Team / भरोसेमंद टीम",
+    "Always Available / हमेशा उपलब्ध"
+  ]
+}
