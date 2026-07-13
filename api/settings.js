@@ -8,6 +8,21 @@ const REPO = process.env.REPO;
 const SETTINGS_PATH = process.env.SETTINGS_PATH || "settings.json";
 const GH_TOKEN = process.env.GITHUB_TOKEN;
 
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const derived = crypto.scryptSync(password, salt, 64).toString("hex");
+  return salt + ":" + derived;
+}
+
+function verifyPassword(password, stored) {
+  if (!stored || !stored.includes(":")) return false;
+  const [salt, key] = stored.split(":");
+  const derived = crypto.scryptSync(password, salt, 64).toString("hex");
+  const a = Buffer.from(key, "hex");
+  const b = Buffer.from(derived, "hex");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
 function verifyToken(token) {
   if (!token || !token.includes(".")) return false;
   const [data, sig] = token.split(".");
@@ -140,7 +155,18 @@ module.exports = async (req, res) => {
     const body = parseBody(req.body);
     if (!body || typeof body !== "object") return res.status(400).end(JSON.stringify({ error: "Bad request" }));
 
-    const updated = sanitizeSettings(body, readSettings());
+    const current = readSettings();
+    const updated = sanitizeSettings(body, current);
+
+    if (body.newPassword) {
+      const currentOk = current.adminPasswordHash
+        ? verifyPassword(body.currentPassword || "", current.adminPasswordHash)
+        : (body.currentPassword || "") === ADMIN_PASSWORD;
+      if (!currentOk) return res.status(401).end(JSON.stringify({ error: "Current password is incorrect" }));
+      if (body.newPassword.length < 4) return res.status(400).end(JSON.stringify({ error: "New password too short" }));
+      updated.adminPasswordHash = hashPassword(body.newPassword);
+    }
+
     try {
       fs.writeFileSync(path.join(process.cwd(), SETTINGS_PATH), JSON.stringify(updated, null, 2));
     } catch (e) {
