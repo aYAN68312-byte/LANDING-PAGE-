@@ -110,10 +110,24 @@ settingsForm.addEventListener("submit", async (e) => {
     servicePoints: f.elements["servicePoints"].value.split("\n").map((s) => s.trim()).filter(Boolean)
   };
 
+  const newPw = f.elements["newPassword"].value;
+  const curPw = f.elements["currentPassword"].value;
+  const confPw = f.elements["confirmPassword"].value;
+  if (newPw) {
+    if (newPw !== confPw) {
+      showToast("❌ New passwords do not match.", false);
+      return;
+    }
+    payload.currentPassword = curPw;
+    payload.newPassword = newPw;
+  }
+
   const res = await api("/api/settings", { method: "POST", body: JSON.stringify(payload) });
   if (res.ok) {
-    showToast("✅ Saved! Changes are live.");
-    f.elements["adminPassword"].value = "";
+    showToast(newPw ? "✅ Saved! Password changed." : "✅ Saved! Changes are live.");
+    f.elements["currentPassword"].value = "";
+    f.elements["newPassword"].value = "";
+    f.elements["confirmPassword"].value = "";
   } else if (res.status === 401) {
     showToast("Session expired. Please login again.", false);
     sessionStorage.removeItem("sb_token");
