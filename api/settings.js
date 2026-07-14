@@ -188,8 +188,10 @@ module.exports = async (req, res) => {
       } catch (e) {
         /* local write may fail on serverless; GitHub commit is the source of truth */
       }
-      const committed = await commitToGitHub(updated);
-      return res.end(JSON.stringify({ ok: true, committed, settings: publicSettings(updated) }));
+      // Respond immediately; commit to GitHub in the background (best-effort).
+      res.end(JSON.stringify({ ok: true, committed: null, settings: publicSettings(updated) }));
+      commitToGitHub(updated).catch(() => {});
+      return;
     } catch (e) {
       // Never return 500 — admin should still see a response.
       return res.status(200).end(JSON.stringify({ ok: true, committed: false, error: String(e && e.message || e) }));
