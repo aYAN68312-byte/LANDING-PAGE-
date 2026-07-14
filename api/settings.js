@@ -113,7 +113,7 @@ function sanitizeSettings(input, current) {
 
 async function ghFetch(url, options) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), 10000);
   try {
     return await fetch(url, { ...options, signal: controller.signal });
   } finally {
