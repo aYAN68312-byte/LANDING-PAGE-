@@ -147,8 +147,24 @@ $("#logout-btn").addEventListener("click", async () => {
   loginView.classList.remove("hidden");
 });
 
+async function loadStats() {
+  try {
+    const res = await fetch("/api/stats");
+    if (!res.ok) return;
+    const s = await res.json();
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set("stat-today", s.today || 0);
+    set("stat-24", s.last24 || 0);
+    set("stat-7", s.last7 || 0);
+    const note = document.getElementById("stat-note");
+    if (note) note.style.display = s.persisted ? "none" : "";
+  } catch (e) {}
+}
+
 if (token) {
   loginView.classList.add("hidden");
   adminView.classList.remove("hidden");
   loadSettings();
+  loadStats();
+  setInterval(loadStats, 30000);
 }
