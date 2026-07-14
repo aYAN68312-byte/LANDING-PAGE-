@@ -104,7 +104,21 @@ function sanitizeSettings(input, current) {
     ? input.servicePoints.map((s) => str(s, "")).filter(Boolean)
     : current.servicePoints;
 
+  if (current.adminPasswordHash && !out.adminPasswordHash) {
+    out.adminPasswordHash = current.adminPasswordHash;
+  }
+
   return out;
+}
+
+async function ghFetch(url, options) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function commitToGitHub(settings) {
@@ -117,14 +131,14 @@ async function commitToGitHub(settings) {
   };
   let sha;
   try {
-    const get = await fetch(url, { headers });
+    const get = await ghFetch(url, { headers });
     if (get.ok) sha = (await get.json()).sha;
   } catch (e) {
     /* ignore */
   }
   const content = Buffer.from(JSON.stringify(settings, null, 2)).toString("base64");
   try {
-    const put = await fetch(url, {
+    const put = await ghFetch(url, {
       method: "PUT",
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -152,28 +166,33 @@ module.exports = async (req, res) => {
 
   if (req.method === "POST") {
     if (!verifyToken(getToken(req))) return res.status(401).end(JSON.stringify({ error: "Unauthorized" }));
-    const body = parseBody(req.body);
-    if (!body || typeof body !== "object") return res.status(400).end(JSON.stringify({ error: "Bad request" }));
-
-    const current = readSettings();
-    const updated = sanitizeSettings(body, current);
-
-    if (body.newPassword) {
-      const currentOk = current.adminPasswordHash
-        ? verifyPassword(body.currentPassword || "", current.adminPasswordHash)
-        : (body.currentPassword || "") === ADMIN_PASSWORD;
-      if (!currentOk) return res.status(401).end(JSON.stringify({ error: "Current password is incorrect" }));
-      if (body.newPassword.length < 4) return res.status(400).end(JSON.stringify({ error: "New password too short" }));
-      updated.adminPasswordHash = hashPassword(body.newPassword);
-    }
-
     try {
-      fs.writeFileSync(path.join(process.cwd(), SETTINGS_PATH), JSON.stringify(updated, null, 2));
+      const body = parseBody(req.body);
+      if (!body || typeof body !== "object") return res.status(400).end(JSON.stringify({ error: "Bad request" }));
+
+      const current = readSettings();
+      const updated = sanitizeSettings(body, current);
+
+      if (body.newPassword) {
+        const currentOk = current.adminPasswordHash
+          ? verifyPassword(body.currentPassword || "", current.adminPasswordHash)
+          : (body.currentPassword || "") === ADMIN_PASSWORD;
+        if (!currentOk) return res.status(401).end(JSON.stringify({ error: "Current password is incorrect" }));
+        if (body.newPassword.length < 4) return res.status(400).end(JSON.stringify({ error: "New password too short" }));
+        updated.adminPasswordHash = hashPassword(body.newPassword);
+      }
+
+      try {
+        fs.writeFileSync(path.join(process.cwd(), SETTINGS_PATH), JSON.stringify(updated, null, 2));
+      } catch (e) {
+        /* local write may fail on serverless; GitHub commit is the source of truth */
+      }
+      const committed = await commitToGitHub(updated);
+      return res.end(JSON.stringify({ ok: true, committed, settings: publicSettings(updated) }));
     } catch (e) {
-      /* local write may fail on serverless; GitHub commit is the source of truth */
+      // Never return 500 — admin should still see a response.
+      return res.status(200).end(JSON.stringify({ ok: true, committed: false, error: String(e && e.message || e) }));
     }
-    const committed = await commitToGitHub(updated);
-    return res.end(JSON.stringify({ ok: true, committed, settings: publicSettings(updated) }));
   }
 
   return res.status(405).end(JSON.stringify({ error: "Method not allowed" }));
