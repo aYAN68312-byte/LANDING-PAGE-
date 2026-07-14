@@ -245,6 +245,10 @@ function sanitizeSettings(input, current) {
     ? input.servicePoints.map((s) => str(s, "")).filter(Boolean)
     : current.servicePoints;
 
+  if (current.adminPasswordHash && !out.adminPasswordHash) {
+    out.adminPasswordHash = current.adminPasswordHash;
+  }
+
   return out;
 }
 
