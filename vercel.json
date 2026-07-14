@@ -2,5 +2,9 @@
   "rewrites": [
     { "source": "/admin", "destination": "/public/admin.html" },
     { "source": "/admin/", "destination": "/public/admin.html" }
-  ]
+  ],
+  "functions": {
+    "api/settings.js": { "maxDuration": 30 }
+  }
 }
+
