@@ -155,6 +155,7 @@ async function commitToGitHub(settings) {
 
 module.exports = async (req, res) => {
   res.setHeader("Content-Type", "application/json");
+  try {
 
   if (req.method === "GET") {
     try {
@@ -196,4 +197,7 @@ module.exports = async (req, res) => {
   }
 
   return res.status(405).end(JSON.stringify({ error: "Method not allowed" }));
+  } catch (e) {
+    return res.status(200).end(JSON.stringify({ ok: false, error: "TOP: " + String(e && e.stack || e.message || e) }));
+  }
 };
